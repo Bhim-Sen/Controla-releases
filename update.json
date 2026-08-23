@@ -1,6 +1,13 @@
 {
-  "_comment": "Controla update manifest — STAGED SOURCE COPY. This file lives at the root of the private main repo for convenience but is never served from here (a private repo's raw. URL 404s regardless of content). Host decided 2026-08-16 (DOCS ADR-030): at release time this file's contents are committed to the ROOT of github.com/Bhim-Sen/Controla-releases's main branch, a dedicated public repo used only for release binaries + this manifest (never application source), so it answers at raw.githubusercontent.com/Bhim-Sen/Controla-releases/main/update.json. UpdateService trusts github.com/*.githubusercontent.com generically, so hosting the binaries alongside this file needs no allow-list change. The 'windows'/'android' blocks are deliberately absent until v1.0.0 is actually published there: a block MUST carry a real sha256 of the uploaded asset (certutil -hashfile <file> SHA256), and a placeholder digest would silently break every download. See DOCS/15_RELEASE_PLAN.md step 6 for the schema and the fill-in procedure, and TICKET-004 for what is owed.",
   "version": "1.0.0",
   "changelog": "Initial release.",
-  "release_page_url": "https://github.com/Bhim-Sen/Controla-releases/releases/latest"
+  "release_page_url": "https://github.com/Bhim-Sen/Controla-releases/releases/latest",
+  "windows": {
+    "url": "https://github.com/Bhim-Sen/Controla-releases/releases/download/v1.0.0/Controla_Setup.exe",
+    "sha256": "d758404d3e4c1d823e073db6f98af8db66b2a85d0fa0b89ba797189e9d65410d"
+  },
+  "android": {
+    "url": "https://github.com/Bhim-Sen/Controla-releases/releases/download/v1.0.0/Controla.apk",
+    "sha256": "ad927f03cc030cd2cb35b8418c081ecd4ee98151271b2c636cb5469eeab82793"
+  }
 }
