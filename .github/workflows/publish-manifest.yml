@@ -1,0 +1,82 @@
+name: Publish update manifest
+
+# Fires when a maintainer clicks "Publish release" on THIS repo (Bhim-Sen/Controla-releases)
+# -- see PublishYourAPP.md step A3/Step 3. Downloads the now-public release assets, computes
+# their real SHA-256 digests, and commits update.json to main -- the actual "go live" step for
+# the in-app updater, which reads straight from
+# raw.githubusercontent.com/Bhim-Sen/Controla-releases/main/update.json.
+#
+# Deliberately triggered on `published`, not at draft-creation time (Controla's own
+# release.yml, the `draft` job): a draft release's assets are not publicly downloadable, so
+# committing update.json any earlier would advertise a version whose download links 404 until
+# a human clicks Publish. Firing here guarantees the assets this manifest points at are
+# already live. See ADR-033 (Controla/DOCS/22_DECISIONS.md) for the full writeup.
+#
+# The changelog field is taken verbatim from the release's own description -- write real
+# release notes in the draft before publishing if you want them to show up in the update
+# dialog; leave it blank and this falls back to "See the release page."
+#
+# minimum_supported_version (forces "Later" to disappear below that version) is never set or
+# cleared by this workflow -- it only carries forward whatever was already in update.json.
+# Edit that field by hand in a follow-up commit if a release needs to be mandatory.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download release assets and compute digests
+        id: hashes
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for name in Controla_Setup.exe Controla.apk; do
+            url="https://github.com/${REPO}/releases/download/${TAG}/${name}"
+            if curl -sfL -o "$name" "$url"; then
+              sha=$(sha256sum "$name" | cut -d' ' -f1)
+              echo "Downloaded $name -- sha256=$sha"
+            else
+              echo "::warning::$name is not attached to $TAG -- its manifest block will be omitted"
+              sha=""
+            fi
+            case "$name" in
+              Controla_Setup.exe) echo "win_sha=$sha" >> "$GITHUB_OUTPUT" ;;
+              Controla.apk) echo "apk_sha=$sha" >> "$GITHUB_OUTPUT" ;;
+            esac
+            rm -f "$name"
+          done
+
+      - name: Build update.json
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          REPO: ${{ github.repository }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          WIN_SHA: ${{ steps.hashes.outputs.win_sha }}
+          APK_SHA: ${{ steps.hashes.outputs.apk_sha }}
+        run: node .github/scripts/build-update-manifest.js
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add update.json
+          if git diff --cached --quiet; then
+            echo "update.json unchanged -- nothing to commit"
+            exit 0
+          fi
+          git commit -m "Publish update manifest for ${{ github.event.release.tag_name }}"
+          git push origin HEAD:main
