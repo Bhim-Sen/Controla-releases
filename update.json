@@ -1,13 +1,13 @@
 {
-  "version": "1.3.0",
-  "changelog": "**Full Changelog**: https://github.com/Bhim-Sen/Controla-releases/compare/v1.2.0...v1.3.0",
+  "version": "1.4.0",
+  "changelog": "**Full Changelog**: https://github.com/Bhim-Sen/Controla-releases/compare/v1.3.0...v1.4.0",
   "release_page_url": "https://github.com/Bhim-Sen/Controla-releases/releases/latest",
   "windows": {
-    "url": "https://github.com/Bhim-Sen/Controla-releases/releases/download/v1.3.0/Controla_Setup.exe",
-    "sha256": "0588b3c5679a09f262a05fe331229aaa496ff45761e01b6b915e09140e6b18f0"
+    "url": "https://github.com/Bhim-Sen/Controla-releases/releases/download/v1.4.0/Controla_Setup.exe",
+    "sha256": "16f29013f2b7f82bb1b72dc64c3232b9efa25883fb0a770cb8717c99b98ddfe1"
   },
   "android": {
-    "url": "https://github.com/Bhim-Sen/Controla-releases/releases/download/v1.3.0/Controla.apk",
-    "sha256": "eb219b3f07087b7f41b092ac9378291d845847c61e3323cc0d0e47dae4166d8f"
+    "url": "https://github.com/Bhim-Sen/Controla-releases/releases/download/v1.4.0/Controla.apk",
+    "sha256": "9e45b7de9fd88fe08f8f1830ddd3f6dc4a9b6d37fb90ab7fd435e9cc5b85eaff"
   }
 }
